@@ -1,0 +1,91 @@
+{% extends 'base_back.html.twig' %}
+
+{% block title %}Liste des Produits{% endblock %}
+
+{% block body %}
+<section class="section py-5">
+  <div class="container">
+
+    <!-- Titre -->
+    <div class="section-title mb-5 text-center">
+      <h2 class="display-6 fw-bold">Produits</h2>
+      <p class="text-muted">Gérez les produits disponibles dans votre pharmacie</p>
+    </div>
+
+    <!-- Flash messages -->
+    {% for message in app.flashes('success') %}
+      <div class="alert alert-success alert-dismissible fade show animate__animated animate__fadeInDown" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+
+    <!-- Ajouter un produit -->
+    <div class="mb-4 text-end">
+      <a href="{{ path('admin_produit_new') }}" class="btn btn-primary btn-lg shadow-sm animate__animated animate__fadeIn">
+        + Ajouter un produit
+      </a>
+    </div>
+
+    <!-- Tableau des produits -->
+    <div class="table-responsive shadow-sm rounded animate__animated animate__fadeInUp">
+      <table class="table table-hover align-middle table-bordered">
+        <thead class="table-primary text-white">
+          <tr>
+            <th>Nom</th>
+            <th>Prix (€)</th>
+            <th>Quantité</th>
+            <th>Catégorie</th>
+            <th>Status</th>
+            <th>Image</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for produit in produits %}
+            <tr class="align-middle">
+              <td>{{ produit.nomProduit }}</td>
+              <td>{{ produit.prixProduit }} €</td>
+              <td>{{ produit.quantiteProduit }}</td>
+              <td>{{ produit.categorieProduit }}</td>
+              <td>
+                {% if produit.statusProduit == 'Disponible' %}
+                  <span class="badge bg-success">{{ produit.statusProduit }}</span>
+                {% elseif produit.statusProduit == 'Rupture' %}
+                  <span class="badge bg-warning">{{ produit.statusProduit }}</span>
+                {% else %}
+                  <span class="badge bg-danger">{{ produit.statusProduit }}</span>
+                {% endif %}
+              </td>
+              <td>
+                <img src="{{ produit.imageProduit }}" alt="{{ produit.nomProduit }}" style="max-width: 80px; border-radius:5px;">
+              </td>
+              <td>{{ produit.descriptionProduit }}</td>
+              <td class="d-flex gap-2">
+                <a href="{{ path('admin_produit_edit', {'id': produit.id_produit}) }}"
+                   class="btn btn-sm btn-warning animate__animated animate__pulse animate__infinite">Modifier</a>
+
+                <form method="post" action="{{ path('admin_produit_delete', {'id': produit.id_produit}) }}">
+                  <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ produit.id_produit) }}">
+                  <button type="submit"
+                          class="btn btn-sm btn-danger animate__animated animate__shakeX"
+                          onclick="return confirm('Supprimer ce produit ?');">Supprimer</button>
+                </form>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="8" class="text-center text-muted">Aucun produit trouvé</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</section>
+
+<!-- Animations CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+{% endblock %}

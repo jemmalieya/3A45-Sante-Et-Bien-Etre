@@ -1,0 +1,161 @@
+{% extends 'base_front.html.twig' %}
+
+{% block title %}Mon Panier{% endblock %}
+
+{% block body %}
+<div class="container-fluid mt-5 pt-5">
+
+  {# Toast container centré en haut #}
+  <div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1050; width: auto; max-width: 400px;">
+    <div id="toast-container"></div>
+  </div>
+
+  <h2 class="text-center mb-4">Mon Panier</h2>
+
+  {% if produits is empty %}
+    <p class="text-center">Votre panier est vide.</p>
+    <div class="text-center mt-4">
+      <a href="{{ path('front_produit_index') }}" class="btn btn-primary">Retour aux produits</a>
+    </div>
+  {% else %}
+    <div class="sidebar-panier p-3 border rounded" style="max-width: 800px; margin:auto; background: linear-gradient(to right, #003399, #00bf6f); color:white;">
+      <table class="table table-borderless text-white">
+        <thead>
+          <tr>
+            <th>Produit</th>
+            <th>Qté</th>
+            <th>Prix (DT)</th>
+            <th>Total (DT)</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for produit in produits %}
+            <tr class="align-middle produit-row" style="transition: all 0.3s; cursor:pointer;" 
+                onmouseover="this.style.background='rgba(255,255,255,0.1)'" 
+                onmouseout="this.style.background='transparent'" 
+                onclick="showDetails('{{ produit.nomProduit }}', '{{ produit.descriptionProduit }}', '{{ produit.prixProduit }}', '{{ produit.quantite_panier }}', '{{ produit.categorieProduit }}', '{{ produit.statusProduit }}', '{{ produit.imageProduit }}')">
+              <td>
+                <img src="{{ produit.imageProduit }}" alt="{{ produit.nomProduit }}" style="width:60px; height:auto; border-radius:5px; margin-right:8px;">
+                {{ produit.nomProduit }}
+              </td>
+              <td>{{ produit.quantite_panier }}</td>
+              <td>{{ produit.prixProduit }} DT</td>
+              <td>{{ produit.prixProduit * produit.quantite_panier }} DT</td>
+              <td>
+                <a href="{{ path('panier_supprimer', {'id': produit.id_produit}) }}" 
+                   class="btn btn-danger btn-sm"
+                   onclick="return confirmDelete('{{ produit.nomProduit }}')"
+                   data-message="{{ produit.nomProduit }} supprimé du panier !">
+                   Supprimer
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="text-end mt-3">
+        <h4>Total : {{ total }} DT</h4>
+        <a href="{{ path('panier_vider') }}" 
+           class="btn btn-warning"
+           data-message="Panier vidé avec succès !"
+           id="btnViderPanier">
+           Vider le panier
+        </a>
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+
+{# Modal détails produit #}
+<div class="modal fade" id="produitModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="produitModalLabel"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Description :</strong> <span id="produitDescription"></span></p>
+        <p><strong>Prix :</strong> <span id="produitPrix"></span> DT</p>
+        <p><strong>Quantité :</strong> <span id="produitQuantite"></span></p>
+        <p><strong>Catégorie :</strong> <span id="produitCategorie"></span></p>
+        <p><strong>Status :</strong> <span id="produitStatus"></span></p>
+        <img id="produitImage" src="" alt="" class="img-fluid rounded mt-2">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Affichage modal détails
+function showDetails(nom, description, prix, quantite, categorie, status, image) {
+  document.getElementById('produitModalLabel').textContent = nom;
+  document.getElementById('produitDescription').textContent = description;
+  document.getElementById('produitPrix').textContent = prix;
+  document.getElementById('produitQuantite').textContent = quantite;
+  document.getElementById('produitCategorie').textContent = categorie;
+  document.getElementById('produitStatus').textContent = status;
+  document.getElementById('produitImage').src = image;
+  var modal = new bootstrap.Modal(document.getElementById('produitModal'));
+  modal.show();
+}
+
+// Confirmation suppression
+function confirmDelete(nomProduit) {
+  return confirm("Êtes-vous sûr de supprimer " + nomProduit + " du panier ?");
+}
+
+// Animation hover lignes et images
+document.querySelectorAll('.sidebar-panier tr').forEach(row => {
+  row.addEventListener('mouseenter', () => row.style.transform = 'scale(1.02)');
+  row.addEventListener('mouseleave', () => row.style.transform = 'scale(1)');
+});
+document.querySelectorAll('.sidebar-panier img').forEach(img => {
+  img.addEventListener('mouseenter', () => img.style.transform = 'scale(1.1)');
+  img.addEventListener('mouseleave', () => img.style.transform = 'scale(1)');
+});
+
+// Toast dynamique sur ajout, suppression, vidage
+document.addEventListener('DOMContentLoaded', () => {
+  const toastContainer = document.getElementById('toast-container');
+
+  document.querySelectorAll('[data-message]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const message = btn.dataset.message;
+      const toastEl = document.createElement('div');
+      toastEl.className = 'toast align-items-center text-white bg-success border-dark';
+      toastEl.role = 'alert';
+      toastEl.ariaLive = 'assertive';
+      toastEl.ariaAtomic = 'true';
+      toastEl.innerHTML = `
+        <div class="d-flex">
+          <div class="toast-body">${message}</div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>`;
+      toastContainer.appendChild(toastEl);
+      const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+      toast.show();
+    });
+  });
+});
+</script>
+
+<style>
+.produit-row:hover {
+  transform: scale(1.02);
+}
+.sidebar-panier img {
+  transition: transform 0.3s;
+}
+.sidebar-panier img:hover {
+  transform: scale(1.1);
+}
+</style>
+
+{% endblock %}

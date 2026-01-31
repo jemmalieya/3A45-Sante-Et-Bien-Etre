@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Admin - MedFlow{% endblock %}</title>
+  <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Header back simple -->
+  <header class="bg-primary text-white py-3 mb-4">
+    <div class="container d-flex justify-content-between">
+      <h1 class="h4">Dashboard Admin</h1>
+      <nav>
+        <a href="{{ path('admin_produit_index') }}" class="text-white me-3">Produits</a>
+        <a href="#" class="text-white">Autres</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Contenu principal -->
+  <main class="container">
+    {% block body %}{% endblock %}
+  </main>
+
+  <!-- Footer simple -->
+  <footer class="bg-light text-center py-3 mt-4">
+    <p>© 2026 MedFlow. Tous droits réservés.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ asset('assets/js/app.js') }}"></script>
+</body>
+</html>
