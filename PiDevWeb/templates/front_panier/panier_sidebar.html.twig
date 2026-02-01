@@ -3,104 +3,201 @@
 {% block title %}Mon Panier{% endblock %}
 
 {% block body %}
-<div class="container mt-5 pt-5">
-  {# Toast container centré #}
+<div class="panier-page">
+  {# Toast container #}
   <div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1050; max-width:400px;" id="toast-container"></div>
 
-  {# Confirmation custom overlay #}
+  {# Confirmation overlay #}
   <div id="confirmOverlay" class="confirm-overlay d-none">
     <div class="confirm-box">
-      <p id="confirmMessage"></p>
-      <div class="confirm-buttons">
-        <button class="btn btn-danger" id="confirmYes">Oui</button>
-        <button class="btn btn-secondary" id="confirmNo">Non</button>
+      <div class="confirm-icon">
+        <i class="bi bi-exclamation-circle text-warning"></i>
+      </div>
+      <h5 class="mt-3">Confirmation</h5>
+      <p id="confirmMessage" class="text-muted"></p>
+      <div class="confirm-buttons mt-4">
+        <button class="btn btn-outline-secondary px-4" id="confirmNo">Annuler</button>
+        <button class="btn btn-danger px-4" id="confirmYes">Confirmer</button>
       </div>
     </div>
   </div>
 
-  <h2 class="text-center mb-4">Mon Panier</h2>
-
-  {% if produits is empty %}
-    <p class="text-center">Votre panier est vide.</p>
-    <div class="text-center mt-4">
-      <a href="{{ path('front_produit_index') }}" class="btn btn-primary">Retour aux produits</a>
-    </div>
-  {% else %}
-    <div class="sidebar-panier p-3 border rounded" style="max-width:800px; margin:auto; background:linear-gradient(to right, #003399, #00bf6f); color:white;">
-      <table class="table table-borderless text-white">
-        <thead>
-          <tr>
-            <th>Produit</th>
-            <th>Qté</th>
-            <th>Prix (DT)</th>
-            <th>Total (DT)</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for produit in produits %}
-            <tr class="align-middle produit-row"
-                onmouseover="this.style.background='rgba(255,255,255,0.1)'"
-                onmouseout="this.style.background='transparent'">
-              <td>
-                <img src="{{ produit.imageProduit }}" alt="{{ produit.nomProduit }}" style="width:60px; border-radius:5px; margin-right:8px;">
-                {{ produit.nomProduit }}
-              </td>
-
-              {# ✅ Qté avec + / - #}
-              <td>
-                <div class="qty-wrap">
-                  <button class="btn btn-light btn-sm btn-qty btn-minus"
-                          data-id="{{ produit.id_produit }}" type="button">−</button>
-
-                  <span class="fw-bold qty-value"
-                        id="qty-{{ produit.id_produit }}"
-                        data-price="{{ produit.prixProduit }}"
-                        data-stock="{{ produit.quantiteProduit }}">
-                    {{ produit.quantite_panier }}
-                  </span>
-
-                  <button class="btn btn-light btn-sm btn-qty btn-plus"
-                          data-id="{{ produit.id_produit }}" type="button">+</button>
-                </div>
-              </td>
-
-              <td>{{ produit.prixProduit }} DT</td>
-
-              {# ✅ total ligne dynamique #}
-              <td>
-                <span class="line-total" id="line-{{ produit.id_produit }}">
-                  {{ produit.prixProduit * produit.quantite_panier }}
-                </span> DT
-              </td>
-
-              <td>
-                <button class="btn btn-danger btn-sm btn-supprimer"
-                        data-id="{{ produit.id_produit }}"
-                        data-nom="{{ produit.nomProduit }}"
-                        data-message="{{ produit.nomProduit }} supprimé du panier !">
-                  Supprimer
-                </button>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-
-      <div class="text-end mt-3">
-        <h4>Total : <span id="cart-total">{{ total }}</span> DT</h4>
-        <button class="btn btn-warning" id="btnViderPanier" data-message="Panier vidé avec succès !">Vider le panier</button>
-        <a href="{{ path('commande_valider') }}" class="btn btn-success w-100">
-        <i class="bi bi-check-circle"></i> Valider la commande
-    </a>
+  <div class="container py-5">
+    
+    {# En-tête #}
+    <div class="panier-header text-center mb-5">
+      <div class="panier-icon mb-3">
+        <i class="bi bi-cart3"></i>
       </div>
+      <h1 class="display-5 fw-bold mb-2">Mon Panier</h1>
+      <p class="text-muted">
+        {% if produits|length > 0 %}
+          {{ produits|length }} article(s) dans votre panier
+        {% else %}
+          Votre panier est vide
+        {% endif %}
+      </p>
     </div>
-  {% endif %}
+
+    {% if produits is empty %}
+      {# Panier vide #}
+      <div class="empty-cart text-center py-5">
+        <div class="empty-cart-icon mb-4">
+          <i class="bi bi-cart-x"></i>
+        </div>
+        <h3 class="mb-3">Votre panier est vide</h3>
+        <p class="text-muted mb-4">Découvrez nos produits et commencez vos achats !</p>
+        <a href="{{ path('front_produit_index') }}" class="btn btn-primary btn-lg px-5">
+          <i class="bi bi-shop me-2"></i>Découvrir nos produits
+        </a>
+      </div>
+    {% else %}
+      <div class="row g-4">
+        
+        {# Liste des produits #}
+        <div class="col-lg-8">
+          <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 py-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold">Articles ({{ produits|length }})</h5>
+                <button class="btn btn-outline-danger btn-sm" id="btnViderPanier" data-message="Panier vidé avec succès !">
+                  <i class="bi bi-trash me-1"></i>Vider le panier
+                </button>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              {% for produit in produits %}
+                <div class="cart-item produit-row">
+                  <div class="row g-3 align-items-center">
+                    
+                    {# Image #}
+                    <div class="col-md-2 col-3">
+                      <div class="product-image">
+                        <img src="{{ produit.imageProduit }}" alt="{{ produit.nomProduit }}">
+                      </div>
+                    </div>
+
+                    {# Infos produit #}
+                    <div class="col-md-4 col-9">
+                      <h6 class="mb-1 fw-bold">{{ produit.nomProduit }}</h6>
+                      <p class="text-muted small mb-0">{{ produit.categorieProduit }}</p>
+                      <span class="badge bg-success-soft text-success mt-1">
+                        <i class="bi bi-check-circle me-1"></i>En stock
+                      </span>
+                    </div>
+
+                    {# Prix unitaire #}
+                    <div class="col-md-2 col-6 text-center">
+                      <small class="text-muted d-block mb-1">Prix unitaire</small>
+                      <span class="fw-bold">{{ produit.prixProduit }} DT</span>
+                    </div>
+
+                    {# Quantité #}
+                    <div class="col-md-2 col-6">
+                      <small class="text-muted d-block mb-2 text-center">Quantité</small>
+                      <div class="qty-control">
+                        <button class="qty-btn btn-minus" data-id="{{ produit.id_produit }}" type="button">
+                          <i class="bi bi-dash"></i>
+                        </button>
+                        <input type="text" 
+                               class="qty-input" 
+                               id="qty-{{ produit.id_produit }}"
+                               value="{{ produit.quantite_panier }}"
+                               data-price="{{ produit.prixProduit }}"
+                               data-stock="{{ produit.quantiteProduit }}"
+                               readonly>
+                        <button class="qty-btn btn-plus" data-id="{{ produit.id_produit }}" type="button">
+                          <i class="bi bi-plus"></i>
+                        </button>
+                      </div>
+                    </div>
+
+                    {# Total ligne #}
+                    <div class="col-md-2 col-12">
+                      <div class="text-center text-md-end">
+                        <small class="text-muted d-block mb-1">Total</small>
+                        <span class="fw-bold fs-5 text-primary line-total" id="line-{{ produit.id_produit }}">
+                          {{ produit.prixProduit * produit.quantite_panier }}
+                        </span> <span class="text-muted">DT</span>
+                      </div>
+                      <div class="text-center text-md-end mt-2">
+                        <button class="btn btn-link text-danger btn-sm p-0 btn-supprimer"
+                                data-id="{{ produit.id_produit }}"
+                                data-nom="{{ produit.nomProduit }}"
+                                data-message="{{ produit.nomProduit }} supprimé du panier !">
+                          <i class="bi bi-trash me-1"></i>Supprimer
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          {# Continuer les achats #}
+          <div class="mt-4">
+            <a href="{{ path('front_produit_index') }}" class="btn btn-outline-primary">
+              <i class="bi bi-arrow-left me-2"></i>Continuer mes achats
+            </a>
+          </div>
+        </div>
+
+        {# Résumé de commande #}
+        <div class="col-lg-4">
+          <div class="card border-0 shadow-sm sticky-top" style="top: 100px;">
+            <div class="card-header bg-primary text-white py-3">
+              <h5 class="mb-0"><i class="bi bi-receipt me-2"></i>Résumé</h5>
+            </div>
+            <div class="card-body">
+              
+              {# Détails du total #}
+              <div class="summary-line">
+                <span class="text-muted">Sous-total</span>
+                <span class="fw-bold" id="cart-subtotal">{{ total }}</span> DT
+              </div>
+              <div class="summary-line">
+                <span class="text-muted">Livraison</span>
+                <span class="text-success fw-bold">Gratuite</span>
+              </div>
+              
+              <hr>
+              
+              <div class="summary-total">
+                <span class="fs-5 fw-bold">Total</span>
+                <span class="fs-4 fw-bold text-primary" id="cart-total">{{ total }}</span> <span class="text-muted">DT</span>
+              </div>
+
+              {# Bouton de validation #}
+              <a href="{{ path('commande_valider') }}" class="btn btn-success w-100 btn-lg mt-4 shadow-sm">
+                <i class="bi bi-check-circle me-2"></i>Valider la commande
+              </a>
+
+              {# Informations supplémentaires #}
+              <div class="mt-4 p-3 bg-light rounded">
+                <h6 class="small fw-bold mb-2">
+                  <i class="bi bi-shield-check text-success me-1"></i>Paiement sécurisé
+                </h6>
+                <p class="small text-muted mb-0">Vos informations sont protégées</p>
+              </div>
+
+              <div class="mt-3 p-3 bg-light rounded">
+                <h6 class="small fw-bold mb-2">
+                  <i class="bi bi-truck text-primary me-1"></i>Livraison rapide
+                </h6>
+                <p class="small text-muted mb-0">Sous 2-3 jours ouvrables</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    {% endif %}
+
+  </div>
 </div>
 
-{# ✅ CSS externe (public/assets/css/...) #}
-<link rel="stylesheet" href="{{ asset('assets/css/panier-qty.css') }}">
-
+{# Scripts #}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const toastContainer = document.getElementById('toast-container');
@@ -114,13 +211,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function showToast(message, color='success') {
     const toastEl = document.createElement('div');
-    toastEl.className = `toast align-items-center text-white bg-${color} border-dark`;
+    toastEl.className = `toast align-items-center text-white bg-${color} border-0 shadow-lg`;
     toastEl.role = 'alert';
-    toastEl.ariaLive = 'assertive';
-    toastEl.ariaAtomic = 'true';
     toastEl.innerHTML = `
       <div class="d-flex">
-        <div class="toast-body">${message}</div>
+        <div class="toast-body"><i class="bi bi-check-circle me-2"></i>${message}</div>
         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
       </div>`;
     toastContainer.appendChild(toastEl);
@@ -128,15 +223,14 @@ document.addEventListener('DOMContentLoaded', () => {
     toast.show();
   }
 
-  // ✅ accessible depuis panier-qty.js
   window.showToast = showToast;
 
-  // Supprimer produit avec confirmation custom
+  // Supprimer produit
   document.querySelectorAll('.btn-supprimer').forEach(btn => {
     btn.addEventListener('click', () => {
       currentUrl = `/panier/supprimer/${btn.dataset.id}`;
       currentMessage = btn.dataset.message;
-      confirmMessage.textContent = `Êtes-vous sûr de supprimer ${btn.dataset.nom} du panier ?`;
+      confirmMessage.textContent = `Voulez-vous vraiment supprimer "${btn.dataset.nom}" de votre panier ?`;
       confirmOverlay.classList.remove('d-none');
     });
   });
@@ -147,24 +241,21 @@ document.addEventListener('DOMContentLoaded', () => {
     btnVider.addEventListener('click', () => {
       currentUrl = '/panier/vider';
       currentMessage = btnVider.dataset.message;
-      confirmMessage.textContent = 'Êtes-vous sûr de vider le panier ?';
+      confirmMessage.textContent = 'Êtes-vous sûr de vouloir vider votre panier ?';
       confirmOverlay.classList.remove('d-none');
     });
   }
 
-  // Bouton Oui
   confirmYes.addEventListener('click', () => {
     window.location.href = currentUrl;
     confirmOverlay.classList.add('d-none');
-    setTimeout(() => showToast(currentMessage), 500);
   });
 
-  // Bouton Non
   confirmNo.addEventListener('click', () => {
     confirmOverlay.classList.add('d-none');
   });
 
-  // Toasts flash Symfony
+  // Flash messages
   {% for message in app.flashes('success') %}
     showToast("{{ message|e }}");
   {% endfor %}
@@ -174,33 +265,198 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-{# ✅ JS externe (public/assets/js/...) #}
 <script src="{{ asset('assets/js/panier-qty.js') }}"></script>
 
 <style>
-/* Popup confirmation custom */
+/* ===== PANIER MODERNE ===== */
+.panier-page {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+}
+
+.panier-icon i {
+  font-size: 4rem;
+  color: #0d6efd;
+}
+
+/* En-tête */
+.panier-header {
+  animation: fadeInDown 0.5s ease;
+}
+
+/* Panier vide */
+.empty-cart-icon i {
+  font-size: 6rem;
+  color: #dee2e6;
+}
+
+.empty-cart {
+  animation: fadeIn 0.5s ease;
+}
+
+/* Item du panier */
+.cart-item {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.cart-item:hover {
+  background-color: #f8f9fa;
+}
+
+.cart-item:last-child {
+  border-bottom: none;
+}
+
+.product-image img {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Contrôles de quantité */
+.qty-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  background: #f8f9fa;
+  border-radius: 50px;
+  padding: 4px;
+  max-width: 130px;
+  margin: 0 auto;
+}
+
+.qty-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: white;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.qty-btn:hover {
+  background: #0d6efd;
+  color: white;
+  transform: scale(1.1);
+}
+
+.qty-input {
+  width: 45px;
+  text-align: center;
+  border: none;
+  background: transparent;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+/* Résumé */
+.summary-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+}
+
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+/* Confirmation overlay */
 .confirm-overlay {
   position: fixed;
-  top:0; left:0; width:100%; height:100%;
-  background: rgba(0,0,0,0.5);
-  display:flex;
-  justify-content:center;
-  align-items:center;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
   z-index: 2000;
+  animation: fadeIn 0.2s ease;
 }
+
 .confirm-box {
-  background:white;
-  padding:20px;
-  border-radius:10px;
-  box-shadow:0 5px 20px rgba(0,0,0,0.3);
-  text-align:center;
-  max-width: 400px;
-  width:90%;
+  background: white;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  max-width: 450px;
+  width: 90%;
+  animation: slideUp 0.3s ease;
 }
+
+.confirm-icon i {
+  font-size: 4rem;
+}
+
 .confirm-buttons {
-  display:flex;
-  justify-content: space-around;
-  margin-top:15px;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+/* Badges */
+.bg-success-soft {
+  background-color: #d1fae5;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .panier-icon i {
+    font-size: 3rem;
+  }
+  
+  .cart-item {
+    padding: 1rem;
+  }
+  
+  .product-image img {
+    height: 60px;
+  }
 }
 </style>
 {% endblock %}
