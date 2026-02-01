@@ -5,10 +5,11 @@ namespace App\Controller;
 use App\Entity\Produit;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
+
 
 #[Route('/panier')]
 class FrontPanierController extends AbstractController
@@ -57,74 +58,53 @@ class FrontPanierController extends AbstractController
         return $this->redirectToRoute('front_produit_index');
     }
 
-    #[Route('/augmenter/{id}', name: 'panier_augmenter')]
-    public function augmenter(int $id, SessionInterface $session, EntityManagerInterface $em): JsonResponse
+    #[Route('/augmenter/{id}', name: 'panier_augmenter', methods: ['POST'])]
+    public function augmenter(Produit $produit, SessionInterface $session): Response
     {
         $panier = $session->get('panier', []);
-        
-        if (isset($panier[$id])) {
-            $panier[$id]['quantite']++;
-            $session->set('panier', $panier);
-            
-            // Calculer le nouveau total
-            $total = 0;
-            $totalItems = 0;
-            foreach ($panier as $item) {
-                $total += $item['prix'] * $item['quantite'];
-                $totalItems += $item['quantite'];
-            }
-            
-            $produit = $em->getRepository(Produit::class)->find($id);
-            
-            return new JsonResponse([
-                'success' => true,
-                'quantite' => $panier[$id]['quantite'],
-                'total' => $total,
-                'totalItems' => $totalItems,
-                'message' => 'Quantité augmentée'
-            ]);
+        $id = $produit->getId_produit();
+    
+        if (!isset($panier[$id])) {
+            $panier[$id] = [
+                'quantite' => 0,
+                'prix' => $produit->getPrixProduit()
+            ];
         }
-        
-        return new JsonResponse(['success' => false, 'message' => 'Produit introuvable']);
+    
+        $stock = (int) ($produit->getQuantiteProduit() ?? 0);
+    
+        if ($stock > 0 && $panier[$id]['quantite'] >= $stock) {
+            return new Response('Produit épuisé', 400);
+        }
+    
+        $panier[$id]['quantite']++;
+        $session->set('panier', $panier);
+    
+        return new Response('Quantité augmentée');
     }
-
-    #[Route('/diminuer/{id}', name: 'panier_diminuer')]
-    public function diminuer(int $id, SessionInterface $session, EntityManagerInterface $em): JsonResponse
+    
+    #[Route('/diminuer/{id}', name: 'panier_diminuer', methods: ['POST'])]
+    public function diminuer(Produit $produit, SessionInterface $session): Response
     {
         $panier = $session->get('panier', []);
-        
-        if (isset($panier[$id])) {
-            $panier[$id]['quantite']--;
-            
-            if ($panier[$id]['quantite'] <= 0) {
-                unset($panier[$id]);
-                $message = 'Produit retiré du panier';
-            } else {
-                $message = 'Quantité diminuée';
-            }
-            
-            $session->set('panier', $panier);
-            
-            // Calculer le nouveau total
-            $total = 0;
-            $totalItems = 0;
-            foreach ($panier as $item) {
-                $total += $item['prix'] * $item['quantite'];
-                $totalItems += $item['quantite'];
-            }
-            
-            return new JsonResponse([
-                'success' => true,
-                'quantite' => isset($panier[$id]) ? $panier[$id]['quantite'] : 0,
-                'total' => $total,
-                'totalItems' => $totalItems,
-                'message' => $message
-            ]);
+        $id = $produit->getId_produit();
+    
+        if (!isset($panier[$id])) {
+            return new Response('Produit introuvable', 400);
         }
-        
-        return new JsonResponse(['success' => false, 'message' => 'Produit introuvable']);
+    
+        $panier[$id]['quantite']--;
+    
+        if ($panier[$id]['quantite'] <= 0) {
+            unset($panier[$id]);
+            $session->set('panier', $panier);
+            return new Response('Produit retiré du panier');
+        }
+    
+        $session->set('panier', $panier);
+        return new Response('Quantité diminuée');
     }
-
+    
     #[Route('/supprimer/{id}', name: 'panier_supprimer')]
     public function supprimer(Produit $produit, SessionInterface $session): Response
     {

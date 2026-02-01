@@ -78,6 +78,7 @@
     Pharmacie
   </a>
 </li>
+      
 
           <li><a href="about.html">About</a></li>
           <li><a href="departments.html">Departments</a></li>
@@ -96,23 +97,15 @@
               <li><a href="404.html">404</a></li>
             </ul>
           </li>
-          <li class="dropdown"><a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-            <ul>
-              <li><a href="#">Dropdown 1</a></li>
-              <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                <ul>
-                  <li><a href="#">Deep Dropdown 1</a></li>
-                  <li><a href="#">Deep Dropdown 2</a></li>
-                  <li><a href="#">Deep Dropdown 3</a></li>
-                  <li><a href="#">Deep Dropdown 4</a></li>
-                  <li><a href="#">Deep Dropdown 5</a></li>
-                </ul>
-              </li>
-              <li><a href="#">Dropdown 2</a></li>
-              <li><a href="#">Dropdown 3</a></li>
-              <li><a href="#">Dropdown 4</a></li>
-            </ul>
-          </li>
+                  <li>
+          <a href="{{ path('panier_index') }}" class="position-relative">
+            <i class="bi bi-cart-fill fs-4"></i>
+            <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              {{ app.session.get('panier') ? app.session.get('panier')|length : 0 }}
+            </span>
+          </a>
+        </li>
+
           <li><a href="contact.html">Contact</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
