@@ -24,20 +24,35 @@
     {% for produit in produits %}
       <div class="col-lg-3 col-md-4 col-sm-6">
         <div class="card produit-card h-100 shadow-sm border-0 position-relative overflow-hidden">
-          <img src="{{ produit.imageProduit }}" class="card-img-top produit-img" alt="{{ produit.nomProduit }}">
+          
+          {# ✅ Badge "Indisponible" sur l'image si produit non disponible #}
+          {% if produit.statusProduit != 'Disponible' %}
+            <div class="badge-indisponible">{{ produit.statusProduit }}</div>
+          {% endif %}
+          
+          <img src="{{ produit.imageProduit }}" class="card-img-top produit-img {{ produit.statusProduit != 'Disponible' ? 'img-grayscale' : '' }}" alt="{{ produit.nomProduit }}">
+          
           <div class="card-body d-flex flex-column justify-content-between">
             <h5 class="card-title">{{ produit.nomProduit }}</h5>
             <p class="mb-2">Prix : {{ produit.prixProduit }} €</p>
-            <span class="badge rounded-pill {{ produit.statusProduit == 'Disponible' ? 'bg-success' : 'bg-secondary' }}">
+            <span class="badge rounded-pill {{ produit.statusProduit == 'Disponible' ? 'bg-success' : 'bg-danger' }}">
               {{ produit.statusProduit }}
             </span>
 
             <div class="mt-3 d-flex justify-content-between align-items-center">
-              <button class="btn btn-primary btn-sm add-to-cart" data-id="{{ produit.id_produit }}" data-nom="{{ produit.nomProduit }}">
-                <i class="bi bi-cart-plus"></i> Ajouter
-              </button>
+              {# ✅ Bouton désactivé si produit non disponible #}
+              {% if produit.statusProduit == 'Disponible' %}
+                <button class="btn btn-primary btn-sm add-to-cart" data-id="{{ produit.id_produit }}" data-nom="{{ produit.nomProduit }}">
+                  <i class="bi bi-cart-plus"></i> Ajouter
+                </button>
+              {% else %}
+                <button class="btn btn-secondary btn-sm" disabled title="Produit {{ produit.statusProduit|lower }}">
+                  <i class="bi bi-cart-x"></i> Indisponible
+                </button>
+              {% endif %}
+              
               <button class="btn btn-outline-info btn-sm view-details" data-bs-toggle="modal" data-bs-target="#modal-{{ produit.id_produit }}">
-                Details
+                Détails
               </button>
             </div>
           </div>
@@ -56,9 +71,14 @@
               <img src="{{ produit.imageProduit }}" class="img-fluid mb-3" style="max-height:200px;">
               <p><strong>Description :</strong> {{ produit.descriptionProduit }}</p>
               <p><strong>Prix :</strong> {{ produit.prixProduit }} €</p>
-              <p><strong>Quantité :</strong> {{ produit.quantiteProduit }}</p>
+              <p><strong>Quantité en stock :</strong> {{ produit.quantiteProduit }}</p>
               <p><strong>Catégorie :</strong> {{ produit.categorieProduit }}</p>
-              <p><strong>Status :</strong> {{ produit.statusProduit }}</p>
+              <p>
+                <strong>Statut :</strong> 
+                <span class="badge {{ produit.statusProduit == 'Disponible' ? 'bg-success' : 'bg-danger' }}">
+                  {{ produit.statusProduit }}
+                </span>
+              </p>
             </div>
           </div>
         </div>
@@ -83,21 +103,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }, 3000);
 
-  // ✅ Ajouter au panier via bouton
+  // ✅ Ajouter au panier via bouton (seulement pour produits disponibles)
   document.querySelectorAll('.add-to-cart').forEach(btn => {
     btn.addEventListener('click', () => {
       const id = btn.dataset.id;
       const nom = btn.dataset.nom;
       
-      // ✅ ROUTE CORRIGÉE : /panier/ajouter/{id}
       fetch(`/panier/ajouter/${id}`, { method: 'GET' })
         .then(response => {
           if (response.ok) {
-            // Afficher message sans recharger la page
             showFlashMessage(nom + ' ajouté au panier avec succès', 'success');
             
-            // Optionnel : Recharger pour mettre à jour le badge panier
-            // location.reload();
+            // ✅ Recharger pour mettre à jour le badge du panier
+            setTimeout(() => location.reload(), 1000);
           } else {
             showFlashMessage('Erreur lors de l\'ajout au panier', 'error');
           }
@@ -108,9 +126,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Animation hover sur les cartes
+  // Animation hover sur les cartes (sauf celles indisponibles)
   document.querySelectorAll('.produit-card').forEach(card => {
-    card.addEventListener('mouseenter', () => card.classList.add('shadow-lg', 'scale-up'));
+    card.addEventListener('mouseenter', () => {
+      if (!card.querySelector('.badge-indisponible')) {
+        card.classList.add('shadow-lg', 'scale-up');
+      }
+    });
     card.addEventListener('mouseleave', () => card.classList.remove('shadow-lg', 'scale-up'));
   });
 });
@@ -243,6 +265,46 @@ function showFlashMessage(message, type) {
   max-height: 180px;
   object-fit: contain;
   background: #f5f9ff;
+}
+
+/* ✅ STYLES POUR PRODUITS INDISPONIBLES */
+
+/* Image en noir et blanc */
+.img-grayscale {
+  filter: grayscale(100%);
+  opacity: 0.6;
+}
+
+/* Badge "Indisponible" sur l'image */
+.badge-indisponible {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(220, 53, 69, 0.95);
+  color: white;
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.85rem;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  text-transform: uppercase;
+}
+
+/* Effet sur carte indisponible */
+.produit-card:has(.badge-indisponible) {
+  opacity: 0.85;
+}
+
+.produit-card:has(.badge-indisponible):hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Bouton désactivé stylisé */
+.btn-secondary:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 </style>
 {% endblock %}
