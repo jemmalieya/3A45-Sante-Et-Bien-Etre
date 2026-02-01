@@ -1,0 +1,163 @@
+{% extends 'base_back.html.twig' %}
+{% block title %}Commande #{{ commande.idCommande }}{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            
+            {# Bouton retour #}
+            <div class="mb-4">
+                <a href="{{ path('admin_commandes_index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Retour à la liste
+                </a>
+            </div>
+
+            {# Messages Flash #}
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show">
+                    <i class="bi bi-check-circle-fill me-2"></i>{{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            {# Détails de la commande #}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-dark text-white">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h4 class="mb-0"><i class="bi bi-receipt"></i> Commande #{{ commande.idCommande }}</h4>
+                        </div>
+                        <div class="col-md-6 text-md-end mt-2 mt-md-0">
+                            <small>{{ commande.dateCreationCommande|date('d/m/Y à H:i') }}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    
+                    {# Informations générales #}
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <h6 class="text-muted">Client</h6>
+                            <p class="fw-bold">User #{{ commande.idUser }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-muted">Montant total</h6>
+                            <p class="fw-bold text-success fs-4">{{ commande.montantTotal|number_format(2, '.', '') }} €</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-muted">Statut actuel</h6>
+                            <p>
+                                {% if commande.statutCommande == 'En attente' %}
+                                    <span class="badge bg-warning text-dark fs-6">{{ commande.statutCommande }}</span>
+                                {% elseif commande.statutCommande == 'En cours' %}
+                                    <span class="badge bg-info fs-6">{{ commande.statutCommande }}</span>
+                                {% elseif commande.statutCommande == 'Expédiée' %}
+                                    <span class="badge bg-primary fs-6">{{ commande.statutCommande }}</span>
+                                {% elseif commande.statutCommande == 'Livrée' %}
+                                    <span class="badge bg-success fs-6">{{ commande.statutCommande }}</span>
+                                {% else %}
+                                    <span class="badge bg-danger fs-6">{{ commande.statutCommande }}</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    {# Produits commandés #}
+                    <h5 class="mb-3"><i class="bi bi-box-seam"></i> Produits commandés</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Produit</th>
+                                    <th class="text-center">Quantité</th>
+                                    <th class="text-end">Prix unitaire</th>
+                                    <th class="text-end">Sous-total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ligne in commande.ligneCommandes %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ ligne.produit.imageProduit }}" 
+                                                 alt="{{ ligne.produit.nomProduit }}"
+                                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;"
+                                                 class="me-3">
+                                            <div>
+                                                <div class="fw-bold">{{ ligne.produit.nomProduit }}</div>
+                                                <small class="text-muted">{{ ligne.produit.categorieProduit }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-primary">{{ ligne.quantite_commandee }}</span>
+                                    </td>
+                                    <td class="text-end">{{ ligne.produit.prixProduit|number_format(2, '.', '') }} €</td>
+                                    <td class="text-end fw-bold">{{ (ligne.produit.prixProduit * ligne.quantite_commandee)|number_format(2, '.', '') }} €</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr class="fw-bold">
+                                    <td colspan="3" class="text-end">TOTAL :</td>
+                                    <td class="text-end text-success fs-5">{{ commande.montantTotal|number_format(2, '.', '') }} €</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+            {# Changer le statut #}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Modifier le statut</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ path('admin_commande_statut', {id: commande.idCommande}) }}">
+                        <div class="row align-items-end">
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold">Nouveau statut :</label>
+                                <select name="statut" class="form-select form-select-lg" required>
+                                    <option value="En attente" {% if commande.statutCommande == 'En attente' %}selected{% endif %}>⏳ En attente</option>
+                                    <option value="En cours" {% if commande.statutCommande == 'En cours' %}selected{% endif %}>🔄 En cours</option>
+                                    <option value="Expédiée" {% if commande.statutCommande == 'Expédiée' %}selected{% endif %}>📦 Expédiée</option>
+                                    <option value="Livrée" {% if commande.statutCommande == 'Livrée' %}selected{% endif %}>✅ Livrée</option>
+                                    <option value="Annulée" {% if commande.statutCommande == 'Annulée' %}selected{% endif %}>❌ Annulée</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                    <i class="bi bi-check-circle"></i> Mettre à jour
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {# Supprimer la commande #}
+            <div class="card shadow-sm border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="bi bi-trash"></i> Zone dangereuse</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Une fois supprimée, cette commande ne pourra pas être récupérée.</p>
+                    <form method="post" action="{{ path('admin_commande_delete', {id: commande.idCommande}) }}" 
+                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette commande ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ commande.idCommande) }}">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Supprimer cette commande
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -90,6 +90,9 @@
       <div class="text-end mt-3">
         <h4>Total : <span id="cart-total">{{ total }}</span> DT</h4>
         <button class="btn btn-warning" id="btnViderPanier" data-message="Panier vidé avec succès !">Vider le panier</button>
+        <a href="{{ path('commande_valider') }}" class="btn btn-success w-100">
+        <i class="bi bi-check-circle"></i> Valider la commande
+    </a>
       </div>
     </div>
   {% endif %}

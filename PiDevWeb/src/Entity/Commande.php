@@ -30,7 +30,7 @@ class Commande
     /**
      * @var Collection<int, LigneCommande>
      */
-    #[ORM\OneToMany(targetEntity: LigneCommande::class, mappedBy: 'commande')]
+    #[ORM\OneToMany(targetEntity: LigneCommande::class, mappedBy: 'commande', cascade: ['remove'], orphanRemoval: true)]
     private Collection $ligne_commandes;
 
     public function __construct()
