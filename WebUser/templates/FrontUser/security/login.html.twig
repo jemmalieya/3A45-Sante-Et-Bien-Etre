@@ -1,0 +1,165 @@
+{% extends 'FrontUser/auth/auth_base.html.twig' %}
+
+{% block title %}Login | MedFlow{% endblock %}
+
+{% block body %}
+<section class="auth-hero">
+  <div class="container position-relative">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-10">
+        <div class="auth-card">
+          <div class="row g-0">
+
+            <!-- LEFT SIDE -->
+            <div class="col-lg-5 d-none d-lg-block">
+              <div class="auth-side" data-aos="fade-right">
+                <span class="auth-badge mb-3"><i class="bi bi-shield-check"></i> Secure Access</span>
+                <h2 class="mb-2">Welcome back 👋</h2>
+                <p class="text-muted">Access appointments, pharmacy, and your personal health space.</p>
+
+                <div class="mini-feature">
+                  <i class="bi bi-calendar-check"></i>
+                  <div>
+                    <strong>Appointments</strong>
+                    <div class="text-muted small">Book & manage visits in seconds</div>
+                  </div>
+                </div>
+
+                <div class="mini-feature">
+                  <i class="bi bi-capsule"></i>
+                  <div>
+                    <strong>Pharmacy</strong>
+                    <div class="text-muted small">Order medical products safely</div>
+                  </div>
+                </div>
+
+                <div class="mini-feature">
+                  <i class="bi bi-chat-dots"></i>
+                  <div>
+                    <strong>Support</strong>
+                    <div class="text-muted small">Fast contact & follow-up</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT SIDE -->
+            <div class="col-lg-7">
+              <div class="p-4 p-md-5" data-aos="fade-up">
+
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <div>
+                    <h1 class="h3 mb-1">Sign in</h1>
+                    <p class="text-muted mb-0">Use your patient account</p>
+                  </div>
+                  <i class="bi bi-heart-pulse-fill fs-3 text-primary"></i>
+                </div>
+
+                {% if error %}
+                  <div class="alert alert-danger">
+                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                  </div>
+                {% endif %}
+
+{% if app.user %}
+    <div class="dropdown">
+        <button class="btn btn-link dropdown-toggle" type="button" id="profileMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-circle" style="font-size: 30px;"></i> <!-- Profile Icon -->
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="profileMenuButton">
+            <li>
+                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#profileEditModal">Modifier Profil</a> <!-- Show modal on click -->
+            </li>
+            <li><a class="dropdown-item" href="{{ path('app_profile_change_photo') }}">Changer la photo de profil</a></li>
+            <li><a class="dropdown-item" href="{{ path('app_logout') }}">Se déconnecter</a></li>
+        </ul>
+    </div>
+{% endif %}
+
+
+
+
+
+
+
+                <form method="post" class="mt-3">
+
+
+                  <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                      <input
+                        type="email"
+                        name="emailUser"
+                        value="{{ last_username }}"
+                        class="form-control"
+                        placeholder="name@example.com"
+                        autocomplete="email"
+                        required
+                        autofocus
+                      >
+                    </div>
+                    <div class="form-text">We never share your email.</div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <div class="input-group">
+                      <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                      <input
+                        id="loginPassword"
+                        type="password"
+                        name="password"
+                        class="form-control"
+                        placeholder="••••••••"
+                        autocomplete="current-password"
+                        required
+                      >
+                      <button class="btn btn-outline-secondary" type="button" data-toggle-password="#loginPassword">
+                        <i class="bi bi-eye"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" name="_remember_me" id="rememberMe">
+                      <label class="form-check-label" for="rememberMe">Remember me</label>
+                    </div>
+                    <a class="small" href="#">Forgot password?</a>
+                  </div>
+
+                  <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                  <button class="btn btn-primary btn-auth w-100" type="submit">
+                    <i class="bi bi-box-arrow-in-right me-2"></i> Login
+                  </button>
+
+                  <div class="divider my-4">or</div>
+
+                  <div class="text-center">
+                    <span class="text-muted">No account?</span>
+                    <a href="{{ path('app_register') }}">Create one</a>
+                  </div>
+
+                </form>
+
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+
+
+        
+
+        <p class="text-center text-muted small mt-3">
+          By continuing, you agree to MedFlow terms & privacy.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

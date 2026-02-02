@@ -1,0 +1,151 @@
+{% extends 'FrontUser/auth/auth_base.html.twig' %}
+
+{% block title %}Register | MedFlow{% endblock %}
+
+{% block body %}
+<section class="auth-hero">
+  <div class="container position-relative">
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-10">
+        <div class="auth-card">
+          <div class="row g-0">
+
+            <!-- LEFT SIDE -->
+            <div class="col-lg-5 d-none d-lg-block">
+              <div class="auth-side" data-aos="fade-right">
+                <span class="auth-badge mb-3"><i class="bi bi-person-plus"></i> Create Account</span>
+                <h2 class="mb-2">Join MedFlow</h2>
+                <p class="text-muted">A smarter way to access hospital services.</p>
+
+                <div class="mini-feature">
+                  <i class="bi bi-shield-lock"></i>
+                  <div>
+                    <strong>Verification</strong>
+                    <div class="text-muted small">Email confirmation for security</div>
+                  </div>
+                </div>
+
+                <div class="mini-feature">
+                  <i class="bi bi-clipboard2-check"></i>
+                  <div>
+                    <strong>Complete Profile</strong>
+                    <div class="text-muted small">Faster appointments & follow-up</div>
+                  </div>
+                </div>
+
+                <div class="mini-feature">
+                  <i class="bi bi-heart-pulse"></i>
+                  <div>
+                    <strong>Patient Space</strong>
+                    <div class="text-muted small">Your health journey, organized</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- RIGHT SIDE -->
+            <div class="col-lg-7">
+              <div class="p-4 p-md-5" data-aos="fade-up">
+
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <div>
+                    <h1 class="h3 mb-1">Create account</h1>
+                    <p class="text-muted mb-0">Fill in your personal information</p>
+                  </div>
+                  <i class="bi bi-person-badge fs-3 text-primary"></i>
+                </div>
+
+                {{ form_start(registrationForm) }}
+                {{ form_errors(registrationForm) }}
+                {% for label, messages in app.flashes %}
+  {% for message in messages %}
+    <div class="alert alert-{{ label }}">{{ message }}</div>
+  {% endfor %}
+{% endfor %}
+
+
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label">Email</label>
+                    {{ form_widget(registrationForm.emailUser, {'attr': {'class':'form-control', 'placeholder':'name@example.com'}}) }}
+                    {{ form_errors(registrationForm.emailUser) }}
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label">Password</label>
+                    {{ form_widget(registrationForm.plainPassword, {'attr': {'class':'form-control', 'placeholder':'••••••••'}}) }}
+                    {{ form_errors(registrationForm.plainPassword) }}
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label">CIN</label>
+                    {{ form_widget(registrationForm.cin, {'attr': {'class':'form-control', 'placeholder':'Your CIN'}}) }}
+                    {{ form_errors(registrationForm.cin) }}
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label">Phone</label>
+                    {{ form_widget(registrationForm.telephoneUser, {'attr': {'class':'form-control', 'placeholder':'+216 ...'}}) }}
+                    {{ form_errors(registrationForm.telephoneUser) }}
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label">Last name</label>
+                    {{ form_widget(registrationForm.nom, {'attr': {'class':'form-control'}}) }}
+                    {{ form_errors(registrationForm.nom) }}
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label">First name</label>
+                    {{ form_widget(registrationForm.prenom, {'attr': {'class':'form-control'}}) }}
+                    {{ form_errors(registrationForm.prenom) }}
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label">Birth date</label>
+                    {{ form_widget(registrationForm.dateNaissance, {'attr': {'class':'form-control'}}) }}
+                    {{ form_errors(registrationForm.dateNaissance) }}
+                  </div>
+
+
+                  <div class="col-12">
+                    <label class="form-label">Address</label>
+                    {{ form_widget(registrationForm.adresseUser, {'attr': {'class':'form-control'}}) }}
+                    {{ form_errors(registrationForm.adresseUser) }}
+                  </div>
+
+                  <div class="col-12">
+                    <div class="form-check mt-2">
+                      {{ form_widget(registrationForm.agreeTerms, {'attr': {'class':'form-check-input'}}) }}
+                      {{ form_label(registrationForm.agreeTerms, "I agree to the Terms", {'label_attr': {'class':'form-check-label'}}) }}
+                      {{ form_errors(registrationForm.agreeTerms) }}
+                    </div>
+                  </div>
+                </div>
+
+                <button class="btn btn-primary btn-auth w-100 mt-4" type="submit">
+                  <i class="bi bi-send-check me-2"></i> Create account
+                </button>
+
+                <div class="text-center mt-3">
+                  <span class="text-muted">Already have an account?</span>
+                  <a href="{{ path('app_login') }}">Login</a>
+                </div>
+
+                {{ form_end(registrationForm) }}
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <p class="text-center text-muted small mt-3">
+          After registration, you’ll receive a confirmation email.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

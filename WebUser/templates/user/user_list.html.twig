@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>User List</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.emailUser }}</td>
+                    <td>{{ user.restricted ? 'Restricted' : 'Active' }}</td>
+                    <td>
+                        <a href="{{ path('admin_restrict_user', {id: user.id}) }}" class="btn btn-warning">Restrict</a>
+                        <a href="{{ path('admin_delete_user', {id: user.id}) }}" class="btn btn-danger">Delete</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

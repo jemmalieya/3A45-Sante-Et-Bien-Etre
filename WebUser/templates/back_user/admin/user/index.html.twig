@@ -1,0 +1,207 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User Management{% endblock %}
+
+{% block body %}
+
+    {# ====== SB ADMIN 2 ASSETS (NO CDN) ====== #}
+    <link rel="stylesheet" href="{{ asset('admin/vendor/fontawesome-free/css/all.min.css') }}" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('admin/css/sb-admin-2.css') }}">
+
+    <div id="wrapper">
+
+        {# ====== SIDEBAR ====== #}
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
+                <div class="sidebar-brand-icon rotate-n-15">
+                    <i class="fas fa-laugh-wink"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">MEDFLOW ADMIN</div>
+            </a>
+
+            <hr class="sidebar-divider my-0">
+
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <hr class="sidebar-divider">
+
+            <div class="sidebar-heading">Interface</div>
+
+            {# USER COLLAPSE #}
+            <li class="nav-item active">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUser"
+                   aria-expanded="true" aria-controls="collapseUser">
+                    <i class="fas fa-fw fa-users"></i>
+                    <span>User</span>
+                </a>
+
+                <div id="collapseUser" class="collapse show" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Gestion Users</h6>
+
+                        {# Change route name if yours is different #}
+                        <a class="collapse-item active" href="{{ path('admin_users') }}">Liste des utilisateurs</a>
+                        <a class="collapse-item" href="#">Option 2</a>
+                        <a class="collapse-item" href="#">Option 3</a>
+                    </div>
+                </div>
+            </li>
+
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+
+        </ul>
+        {# ====== END SIDEBAR ====== #}
+
+        {# ====== CONTENT WRAPPER ====== #}
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <div id="content">
+
+                {# ====== TOPBAR ====== #}
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <ul class="navbar-nav ml-auto">
+                        <div class="topbar-divider d-none d-sm-block"></div>
+
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Admin</span>
+                                <img class="img-profile rounded-circle"
+                                     src="{{ asset('admin/img/undraw_profile.svg') }}">
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                 aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+
+                </nav>
+                {# ====== END TOPBAR ====== #}
+
+                {# ====== PAGE CONTENT ====== #}
+                <div class="container-fluid">
+
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">User Management</h1>
+                    </div>
+
+                    {# Flash messages (modern way) #}
+                    {% for message in app.flashes('success') %}
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                    {% endfor %}
+
+                    {% for message in app.flashes('error') %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                    {% endfor %}
+
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3 d-flex align-items-center justify-content-between">
+                            <h6 class="m-0 font-weight-bold text-primary">Liste des utilisateurs</h6>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" width="100%" cellspacing="0">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Status</th>
+                                        <th style="width: 180px;">Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for user in users %}
+                                        <tr>
+                                            <td>{{ user.id }}</td>
+                                            <td>{{ user.emailUser }}</td>
+                                            <td>{{ user.emailUser }}</td>
+                                            <td>
+                                                {% if user.statutCompte %}
+                                                    <span class="badge badge-warning">Active</span>
+                                                {% else %}
+                                                    <span class="badge badge-success">Restricted</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{{ path('admin_user_delete', {id: user.id}) }}"
+                                                   class="btn btn-danger btn-sm">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+
+                                                <a href="{{ path('admin_user_restrict', {id: user.id}) }}"
+                                                   class="btn btn-warning btn-sm">
+                                                    {% if user.statutCompte %}
+                                                        <i class="fas fa-lock"></i>
+                                                    {% else %}
+                                                        <i class="fas fa-ban"></i>
+                                                    {% endif %}
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted">No users found.</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                {# ====== END PAGE CONTENT ====== #}
+
+            </div>
+
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; MEDFLOW</span>
+                    </div>
+                </div>
+            </footer>
+
+        </div>
+        {# ====== END CONTENT WRAPPER ====== #}
+    </div>
+
+    {# ====== SB ADMIN 2 JS (NO CDN) ====== #}
+    <script src="{{ asset('admin/vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('admin/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('admin/vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+    <script src="{{ asset('admin/js/sb-admin-2.min.js') }}"></script>
+
+{% endblock %}
