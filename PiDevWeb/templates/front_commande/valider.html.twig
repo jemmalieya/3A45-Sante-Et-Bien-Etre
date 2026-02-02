@@ -43,15 +43,15 @@
                                     <td class="text-center">
                                         <span class="badge bg-primary rounded-pill">{{ produit.quantite_panier }}</span>
                                     </td>
-                                    <td class="text-end">{{ produit.prixProduit|number_format(2, '.', '') }} €</td>
-                                    <td class="text-end fw-bold">{{ (produit.prixProduit * produit.quantite_panier)|number_format(2, '.', '') }} €</td>
+                                    <td class="text-end">{{ produit.prixProduit|number_format(2, '.', '') }} Dt</td>
+                                    <td class="text-end fw-bold">{{ (produit.prixProduit * produit.quantite_panier)|number_format(2, '.', '') }} Dt</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                             <tfoot class="table-light">
                                 <tr>
                                     <td colspan="3" class="text-end fw-bold fs-5">Total :</td>
-                                    <td class="text-end fw-bold fs-5 text-success">{{ total|number_format(2, '.', '') }} €</td>
+                                    <td class="text-end fw-bold fs-5 text-success">{{ total|number_format(2, '.', '') }} Dt</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -82,7 +82,7 @@
             <h5>Confirmer votre commande</h5>
         </div>
         <div class="confirm-modal-body">
-            <p>Voulez-vous vraiment confirmer cette commande d'un montant de <strong>{{ total|number_format(2, '.', '') }} €</strong> ?</p>
+            <p>Voulez-vous vraiment confirmer cette commande d'un montant de <strong>{{ total|number_format(2, '.', '') }} Dt</strong> ?</p>
             <p class="text-muted mb-0">Cette action est irréversible.</p>
         </div>
         <div class="confirm-modal-footer">

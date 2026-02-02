@@ -69,9 +69,9 @@
                                     <td class="text-center">
                                         <span class="badge bg-primary rounded-pill fs-6">{{ ligne.quantite_commandee }}</span>
                                     </td>
-                                    <td class="text-end">{{ ligne.produit.prixProduit|number_format(2, '.', '') }} €</td>
+                                    <td class="text-end">{{ ligne.produit.prixProduit|number_format(2, '.', '') }} Dt</td>
                                     <td class="text-end fw-bold text-success">
-                                        {{ (ligne.produit.prixProduit * ligne.quantite_commandee)|number_format(2, '.', '') }} €
+                                        {{ (ligne.produit.prixProduit * ligne.quantite_commandee)|number_format(2, '.', '') }} Dt
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -79,7 +79,7 @@
                             <tfoot class="table-light">
                                 <tr class="fw-bold fs-5">
                                     <td colspan="3" class="text-end">Total :</td>
-                                    <td class="text-end text-success">{{ commande.montantTotal|number_format(2, '.', '') }} €</td>
+                                    <td class="text-end text-success">{{ commande.montantTotal|number_format(2, '.', '') }} Dt</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -102,7 +102,7 @@
                     <div class="card h-100 shadow-sm">
                         <div class="card-body">
                             <h6 class="card-title"><i class="bi bi-credit-card"></i> Paiement</h6>
-                            <p class="mb-0">Montant total : <strong class="text-success">{{ commande.montantTotal|number_format(2, '.', '') }} €</strong></p>
+                            <p class="mb-0">Montant total : <strong class="text-success">{{ commande.montantTotal|number_format(2, '.', '') }} Dt</strong></p>
                         </div>
                     </div>
                 </div>

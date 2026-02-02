@@ -52,7 +52,7 @@
                                         <td class="fw-bold">#{{ commande.idCommande }}</td>
                                         <td>{{ commande.dateCreationCommande|date('d/m/Y H:i') }}</td>
                                         <td>User #{{ commande.idUser }}</td>
-                                        <td class="fw-bold text-success">{{ commande.montantTotal|number_format(2, '.', '') }} €</td>
+                                        <td class="fw-bold text-success">{{ commande.montantTotal|number_format(2, '.', '') }} Dt</td>
                                         <td>
                                             {% if commande.statutCommande == 'En attente' %}
                                                 <span class="badge bg-warning text-dark">{{ commande.statutCommande }}</span>

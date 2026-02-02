@@ -58,19 +58,22 @@ class BackCommandeController extends AbstractController
         return $this->redirectToRoute('admin_commande_show', ['id' => $commande->getIdCommande()]);
     }
 
-    // ✅ Supprimer une commande
+    // ✅ Supprimer une commande (sans CSRF)
     #[Route('/{id}/delete', name: 'admin_commande_delete', methods: ['POST'])]
     public function delete(
-        Request $request, 
         Commande $commande, 
         EntityManagerInterface $em
     ): Response {
-        if ($this->isCsrfTokenValid('delete'.$commande->getIdCommande(), $request->request->get('_token'))) {
-            $em->remove($commande);
-            $em->flush();
-            
-            $this->addFlash('success', 'Commande supprimée avec succès');
+        // Supprimer d'abord les lignes de commande
+        foreach ($commande->getLigneCommandes() as $ligne) {
+            $em->remove($ligne);
         }
+        
+        // Ensuite supprimer la commande
+        $em->remove($commande);
+        $em->flush();
+        
+        $this->addFlash('success', 'Commande supprimée avec succès');
 
         return $this->redirectToRoute('admin_commandes_index');
     }

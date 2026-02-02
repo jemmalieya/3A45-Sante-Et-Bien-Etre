@@ -16,46 +16,104 @@ class Produit
     #[ORM\Column]
     private ?int $id_produit = null;
 
-    // Nom du produit
+    // ✅ Nom du produit
     #[ORM\Column(length: 150)]
     #[Assert\NotBlank(message: "Le nom du produit est obligatoire.")]
+    #[Assert\Length(
+        min: 3,
+        max: 150,
+        minMessage: "Le nom doit contenir au moins {{ limit }} caractères.",
+        maxMessage: "Le nom ne peut pas dépasser {{ limit }} caractères."
+    )]
+    #[Assert\Regex(
+        pattern: '/^[a-zA-ZàâäéèêëïîôùûüÿçÀÂÄÉÈÊËÏÎÔÙÛÜŸÇ\s\-]+$/u',
+        message: "Le nom ne peut contenir que des lettres, espaces et tirets."
+    )]
     private ?string $nom_produit = null;
 
-    // Description du produit
+    // ✅ Description
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "La description est obligatoire.")]
+    #[Assert\Length(
+        min: 10,
+        max: 255,
+        minMessage: "La description doit contenir au moins {{ limit }} caractères.",
+        maxMessage: "La description ne peut pas dépasser {{ limit }} caractères."
+    )]
     private ?string $description_produit = null;
 
-    // Prix du produit
+    // ✅ Prix
     #[ORM\Column]
+    #[Assert\NotNull(message: "Le prix est obligatoire.")]
     #[Assert\Positive(message: "Le prix doit être positif.")]
+    #[Assert\Range(
+        min: 0.01,
+        max: 999999.99,
+        notInRangeMessage: "Le prix doit être entre {{ min }} et {{ max }} DT."
+    )]
     private ?float $prix_produit = null;
 
-    // Quantité disponible
+    // ✅ Quantité
     #[ORM\Column]
-    #[Assert\GreaterThanOrEqual(0, message: "La quantité ne peut pas être négative.")]
+    #[Assert\NotNull(message: "La quantité est obligatoire.")]
+    #[Assert\PositiveOrZero(message: "La quantité ne peut pas être négative.")]
+    #[Assert\Range(
+        min: 0,
+        max: 100000,
+        notInRangeMessage: "La quantité doit être entre {{ min }} et {{ max }}."
+    )]
+    #[Assert\Type(
+        type: 'integer',
+        message: "La quantité doit être un nombre entier."
+    )]
     private ?int $quantite_produit = null;
 
-    // Image (URL)
+    // ✅ Image (URL) - Accepte toutes les URLs
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "L'image est obligatoire.")]
-    #[Assert\Url(message: "L'image doit être une URL valide.")]
+    #[Assert\NotBlank(message: "L'URL de l'image est obligatoire.")]
+    #[Assert\Url(
+        message: "L'URL de l'image n'est pas valide. Elle doit commencer par http:// ou https://",
+        protocols: ['http', 'https']
+    )]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: "L'URL ne peut pas dépasser {{ limit }} caractères."
+    )]
     private ?string $image_produit = null;
 
-    // Catégorie du produit
+    // ✅ Catégorie
     #[ORM\Column(length: 150)]
     #[Assert\NotBlank(message: "La catégorie est obligatoire.")]
+    #[Assert\Choice(
+        choices: [
+            'Médicaments',
+            'Vitamines & Compléments',
+            'Soins & Hygiène',
+            'Matériel médical',
+            'Pansements & Bandages',
+            'Premiers soins',
+            'Nutrition & Diététique',
+            'Bébé & Maman',
+            'Beauté & Cosmétique',
+            'Accessoires'
+        ],
+        message: "Veuillez sélectionner une catégorie valide."
+    )]
     private ?string $categorie_produit = null;
 
-    // Status du produit
+    // ✅ Statut
     #[ORM\Column(length: 50)]
-    #[Assert\Choice(choices: ['Disponible','Rupture','Expire'], message: "Status invalide.")]
+    #[Assert\NotBlank(message: "Le statut est obligatoire.")]
+    #[Assert\Choice(
+        choices: ['Disponible', 'Rupture', 'Indisponible'],
+        message: "Le statut doit être : Disponible, Rupture ou Indisponible."
+    )]
     private ?string $status_produit = null;
 
     /**
      * @var Collection<int, LigneCommande>
      */
-    #[ORM\OneToMany(targetEntity: LigneCommande::class, mappedBy: 'produit')]
+    #[ORM\OneToMany(targetEntity: LigneCommande::class, mappedBy: 'produit', cascade: ['remove'], orphanRemoval: true)]
     private Collection $ligne_commandes;
 
     public function __construct()
@@ -63,13 +121,13 @@ class Produit
         $this->ligne_commandes = new ArrayCollection();
     }
 
-    // ID
+    // Getters et Setters
+
     public function getId_produit(): ?int
     {
         return $this->id_produit;
     }
 
-    // Nom
     public function getNomProduit(): ?string
     {
         return $this->nom_produit;
@@ -77,11 +135,10 @@ class Produit
 
     public function setNomProduit(string $nom_produit): static
     {
-        $this->nom_produit = $nom_produit;
+        $this->nom_produit = trim($nom_produit);
         return $this;
     }
 
-    // Description
     public function getDescriptionProduit(): ?string
     {
         return $this->description_produit;
@@ -89,11 +146,10 @@ class Produit
 
     public function setDescriptionProduit(string $description_produit): static
     {
-        $this->description_produit = $description_produit;
+        $this->description_produit = trim($description_produit);
         return $this;
     }
 
-    // Prix
     public function getPrixProduit(): ?float
     {
         return $this->prix_produit;
@@ -101,11 +157,10 @@ class Produit
 
     public function setPrixProduit(float $prix_produit): static
     {
-        $this->prix_produit = $prix_produit;
+        $this->prix_produit = round($prix_produit, 2);
         return $this;
     }
 
-    // Quantité
     public function getQuantiteProduit(): ?int
     {
         return $this->quantite_produit;
@@ -117,19 +172,18 @@ class Produit
         return $this;
     }
 
-    // Image
     public function getImageProduit(): ?string
     {
         return $this->image_produit;
     }
 
-    public function setImageProduit(string $image_produit): static
-    {
-        $this->image_produit = $image_produit;
-        return $this;
-    }
+    public function setImageProduit(?string $image_produit): static
+{
+    $this->image_produit = $image_produit ? trim($image_produit) : null;
+    return $this;
+}
 
-    // Catégorie
+
     public function getCategorieProduit(): ?string
     {
         return $this->categorie_produit;
@@ -137,11 +191,10 @@ class Produit
 
     public function setCategorieProduit(string $categorie_produit): static
     {
-        $this->categorie_produit = $categorie_produit;
+        $this->categorie_produit = trim($categorie_produit);
         return $this;
     }
 
-    // Status
     public function getStatusProduit(): ?string
     {
         return $this->status_produit;
@@ -153,7 +206,6 @@ class Produit
         return $this;
     }
 
-    // Relation avec LigneCommande
     public function getLigneCommandes(): Collection
     {
         return $this->ligne_commandes;

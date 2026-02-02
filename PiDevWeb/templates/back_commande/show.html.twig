@@ -43,7 +43,7 @@
                         </div>
                         <div class="col-md-4">
                             <h6 class="text-muted">Montant total</h6>
-                            <p class="fw-bold text-success fs-4">{{ commande.montantTotal|number_format(2, '.', '') }} €</p>
+                            <p class="fw-bold text-success fs-4">{{ commande.montantTotal|number_format(2, '.', '') }} Dt</p>
                         </div>
                         <div class="col-md-4">
                             <h6 class="text-muted">Statut actuel</h6>
@@ -95,15 +95,15 @@
                                     <td class="text-center">
                                         <span class="badge bg-primary">{{ ligne.quantite_commandee }}</span>
                                     </td>
-                                    <td class="text-end">{{ ligne.produit.prixProduit|number_format(2, '.', '') }} €</td>
-                                    <td class="text-end fw-bold">{{ (ligne.produit.prixProduit * ligne.quantite_commandee)|number_format(2, '.', '') }} €</td>
+                                    <td class="text-end">{{ ligne.produit.prixProduit|number_format(2, '.', '') }} Dt</td>
+                                    <td class="text-end fw-bold">{{ (ligne.produit.prixProduit * ligne.quantite_commandee)|number_format(2, '.', '') }} Dt</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                             <tfoot class="table-light">
                                 <tr class="fw-bold">
                                     <td colspan="3" class="text-end">TOTAL :</td>
-                                    <td class="text-end text-success fs-5">{{ commande.montantTotal|number_format(2, '.', '') }} €</td>
+                                    <td class="text-end text-success fs-5">{{ commande.montantTotal|number_format(2, '.', '') }} Dt</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -141,21 +141,21 @@
             </div>
 
             {# Supprimer la commande #}
-            <div class="card shadow-sm border-danger">
-                <div class="card-header bg-danger text-white">
-                    <h5 class="mb-0"><i class="bi bi-trash"></i> Zone dangereuse</h5>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted">Une fois supprimée, cette commande ne pourra pas être récupérée.</p>
-                    <form method="post" action="{{ path('admin_commande_delete', {id: commande.idCommande}) }}" 
-                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette commande ?');">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ commande.idCommande) }}">
-                        <button type="submit" class="btn btn-danger">
-                            <i class="bi bi-trash"></i> Supprimer cette commande
-                        </button>
-                    </form>
-                </div>
-            </div>
+            {# Supprimer la commande - SANS CSRF #}
+<div class="card shadow-sm border-danger">
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0"><i class="bi bi-trash"></i> Zone dangereuse</h5>
+    </div>
+    <div class="card-body">
+        <p class="text-muted">Une fois supprimée, cette commande ne pourra pas être récupérée.</p>
+        <form method="post" action="{{ path('admin_commande_delete', {id: commande.idCommande}) }}" 
+              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette commande ?');">
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Supprimer cette commande
+            </button>
+        </form>
+    </div>
+</div>
 
         </div>
     </div>

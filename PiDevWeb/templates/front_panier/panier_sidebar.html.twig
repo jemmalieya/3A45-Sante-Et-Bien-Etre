@@ -4,6 +4,7 @@
 
 {% block body %}
 <div class="panier-page">
+
   {# Toast container #}
   <div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1050; max-width:400px;" id="toast-container"></div>
 
@@ -16,21 +17,22 @@
       <h5 class="mt-3">Confirmation</h5>
       <p id="confirmMessage" class="text-muted"></p>
       <div class="confirm-buttons mt-4">
-        <button class="btn btn-outline-secondary px-4" id="confirmNo">Annuler</button>
-        <button class="btn btn-danger px-4" id="confirmYes">Confirmer</button>
+        <button class="btn btn-outline-secondary px-4" id="confirmNo" type="button">Annuler</button>
+        <button class="btn btn-danger px-4" id="confirmYes" type="button">Confirmer</button>
       </div>
     </div>
   </div>
 
   <div class="container py-5">
-    
+
     {# En-tête #}
     <div class="panier-header text-center mb-5">
       <div class="panier-icon mb-3">
         <i class="bi bi-cart3"></i>
       </div>
       <h1 class="display-5 fw-bold mb-2">Mon Panier</h1>
-      <p class="text-muted">
+
+      <p class="text-muted" id="cart-items-text">
         {% if produits|length > 0 %}
           {{ produits|length }} article(s) dans votre panier
         {% else %}
@@ -41,7 +43,7 @@
 
     {% if produits is empty %}
       {# Panier vide #}
-      <div class="empty-cart text-center py-5">
+      <div class="empty-cart text-center py-5" id="empty-cart-block">
         <div class="empty-cart-icon mb-4">
           <i class="bi bi-cart-x"></i>
         </div>
@@ -52,24 +54,30 @@
         </a>
       </div>
     {% else %}
-      <div class="row g-4">
-        
+      <div class="row g-4" id="cart-content">
+
         {# Liste des produits #}
         <div class="col-lg-8">
           <div class="card border-0 shadow-sm">
             <div class="card-header bg-white border-0 py-3">
               <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fw-bold">Articles ({{ produits|length }})</h5>
-                <button class="btn btn-outline-danger btn-sm" id="btnViderPanier" data-message="Panier vidé avec succès !">
+                <h5 class="mb-0 fw-bold">Articles (<span id="cart-count-products">{{ produits|length }}</span>)</h5>
+
+                <button class="btn btn-outline-danger btn-sm" id="btnViderPanier" type="button">
                   <i class="bi bi-trash me-1"></i>Vider le panier
                 </button>
               </div>
             </div>
-            <div class="card-body p-0">
+
+            <div class="card-body p-0" id="cart-items-list">
               {% for produit in produits %}
-                <div class="cart-item produit-row">
+                <div class="cart-item produit-row" id="cart-row-{{ produit.id_produit }}"
+                     data-id="{{ produit.id_produit }}"
+                     data-price="{{ produit.prixProduit }}"
+                     data-qty="{{ produit.quantite_panier }}">
+
                   <div class="row g-3 align-items-center">
-                    
+
                     {# Image #}
                     <div class="col-md-2 col-3">
                       <div class="product-image">
@@ -92,27 +100,29 @@
                       <span class="fw-bold">{{ produit.prixProduit }} DT</span>
                     </div>
 
-                    {# Quantité #}
-                    <div class="col-md-2 col-6">
-                      <small class="text-muted d-block mb-2 text-center">Quantité</small>
-                      <div class="qty-control">
-                        <button class="qty-btn btn-minus" data-id="{{ produit.id_produit }}" type="button">
-                          <i class="bi bi-dash"></i>
-                        </button>
-                        <input type="text" 
-                               class="qty-input" 
-                               id="qty-{{ produit.id_produit }}"
-                               value="{{ produit.quantite_panier }}"
-                               data-price="{{ produit.prixProduit }}"
-                               data-stock="{{ produit.quantiteProduit }}"
-                               readonly>
-                        <button class="qty-btn btn-plus" data-id="{{ produit.id_produit }}" type="button">
-                          <i class="bi bi-plus"></i>
-                        </button>
-                      </div>
-                    </div>
+{# Quantité #}
+<div class="col-md-2 col-6">
+  <small class="text-muted d-block mb-2 text-center">Quantité</small>
 
-                    {# Total ligne #}
+  <div class="qty-control">
+    <button class="qty-btn btn-minus" type="button" data-id="{{ produit.id_produit }}">
+      <i class="bi bi-dash"></i>
+    </button>
+
+    <input type="text"
+           class="qty-input"
+           id="qty-{{ produit.id_produit }}"
+           value="{{ produit.quantite_panier }}"
+           data-stock="{{ produit.quantiteProduit }}"
+           readonly>
+
+    <button class="qty-btn btn-plus" type="button" data-id="{{ produit.id_produit }}">
+      <i class="bi bi-plus"></i>
+    </button>
+  </div>
+</div>
+
+                    {# Total ligne + supprimer #}
                     <div class="col-md-2 col-12">
                       <div class="text-center text-md-end">
                         <small class="text-muted d-block mb-1">Total</small>
@@ -120,15 +130,17 @@
                           {{ produit.prixProduit * produit.quantite_panier }}
                         </span> <span class="text-muted">DT</span>
                       </div>
+
                       <div class="text-center text-md-end mt-2">
                         <button class="btn btn-link text-danger btn-sm p-0 btn-supprimer"
+                                type="button"
                                 data-id="{{ produit.id_produit }}"
-                                data-nom="{{ produit.nomProduit }}"
-                                data-message="{{ produit.nomProduit }} supprimé du panier !">
+                                data-nom="{{ produit.nomProduit }}">
                           <i class="bi bi-trash me-1"></i>Supprimer
                         </button>
                       </div>
                     </div>
+
                   </div>
                 </div>
               {% endfor %}
@@ -149,31 +161,29 @@
             <div class="card-header bg-primary text-white py-3">
               <h5 class="mb-0"><i class="bi bi-receipt me-2"></i>Résumé</h5>
             </div>
+
             <div class="card-body">
-              
-              {# Détails du total #}
               <div class="summary-line">
                 <span class="text-muted">Sous-total</span>
-                <span class="fw-bold" id="cart-subtotal">{{ total }}</span> DT
+                <span class="fw-bold"><span id="cart-subtotal">{{ total }}</span> DT</span>
               </div>
+
               <div class="summary-line">
                 <span class="text-muted">Livraison</span>
                 <span class="text-success fw-bold">Gratuite</span>
               </div>
-              
+
               <hr>
-              
+
               <div class="summary-total">
                 <span class="fs-5 fw-bold">Total</span>
-                <span class="fs-4 fw-bold text-primary" id="cart-total">{{ total }}</span> <span class="text-muted">DT</span>
+                <span class="fs-4 fw-bold text-primary"><span id="cart-total">{{ total }}</span> <span class="text-muted">DT</span></span>
               </div>
 
-              {# Bouton de validation #}
               <a href="{{ path('commande_valider') }}" class="btn btn-success w-100 btn-lg mt-4 shadow-sm">
                 <i class="bi bi-check-circle me-2"></i>Valider la commande
               </a>
 
-              {# Informations supplémentaires #}
               <div class="mt-4 p-3 bg-light rounded">
                 <h6 class="small fw-bold mb-2">
                   <i class="bi bi-shield-check text-success me-1"></i>Paiement sécurisé
@@ -193,11 +203,10 @@
 
       </div>
     {% endif %}
-
   </div>
 </div>
 
-{# Scripts #}
+{# ===== SCRIPTS ===== #}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const toastContainer = document.getElementById('toast-container');
@@ -206,8 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const confirmYes = document.getElementById('confirmYes');
   const confirmNo = document.getElementById('confirmNo');
 
-  let currentUrl = null;
-  let currentMessage = null;
+  let currentAction = null; // { url, type, id }
 
   function showToast(message, color='success') {
     const toastEl = document.createElement('div');
@@ -223,49 +231,234 @@ document.addEventListener('DOMContentLoaded', () => {
     toast.show();
   }
 
-  window.showToast = showToast;
+  function updateCartBadge(count) {
+    const badge = document.getElementById('cart-count');
+    if (!badge) return;
 
-  // Supprimer produit
+    badge.textContent = count;
+    if (count <= 0) badge.classList.add('d-none');
+    else badge.classList.remove('d-none');
+  }
+
+  function recalcTotals() {
+    let subtotal = 0;
+    document.querySelectorAll('.cart-item.produit-row').forEach(row => {
+      const price = parseFloat(row.dataset.price || '0');
+      const qty = parseInt(row.dataset.qty || '0', 10);
+      subtotal += price * qty;
+    });
+
+    subtotal = Math.round(subtotal * 100) / 100;
+
+    const subtotalEl = document.getElementById('cart-subtotal');
+    const totalEl = document.getElementById('cart-total');
+    if (subtotalEl) subtotalEl.textContent = subtotal;
+    if (totalEl) totalEl.textContent = subtotal;
+  }
+
+  function refreshHeaderCounts() {
+    const rows = document.querySelectorAll('.cart-item.produit-row');
+    const countProducts = rows.length;
+
+    const countProductsEl = document.getElementById('cart-count-products');
+    if (countProductsEl) countProductsEl.textContent = countProducts;
+
+    const textEl = document.getElementById('cart-items-text');
+    if (textEl) {
+      if (countProducts > 0) textEl.textContent = `${countProducts} article(s) dans votre panier`;
+      else textEl.textContent = `Votre panier est vide`;
+    }
+  }
+
+  // ---- Supprimer produit (ouvre overlay) ----
   document.querySelectorAll('.btn-supprimer').forEach(btn => {
     btn.addEventListener('click', () => {
-      currentUrl = `/panier/supprimer/${btn.dataset.id}`;
-      currentMessage = btn.dataset.message;
-      confirmMessage.textContent = `Voulez-vous vraiment supprimer "${btn.dataset.nom}" de votre panier ?`;
+      const id = btn.dataset.id;
+      const nom = btn.dataset.nom;
+
+      currentAction = { url: `/panier/supprimer/${id}`, type: 'delete', id: id };
+
+      confirmMessage.textContent = `Voulez-vous vraiment supprimer "${nom}" de votre panier ?`;
       confirmOverlay.classList.remove('d-none');
     });
   });
 
-  // Vider panier
+  // ---- Vider panier (ouvre overlay) ----
   const btnVider = document.getElementById('btnViderPanier');
-  if(btnVider){
+  if (btnVider) {
     btnVider.addEventListener('click', () => {
-      currentUrl = '/panier/vider';
-      currentMessage = btnVider.dataset.message;
+      currentAction = { url: `/panier/vider`, type: 'clear', id: null };
+
       confirmMessage.textContent = 'Êtes-vous sûr de vouloir vider votre panier ?';
       confirmOverlay.classList.remove('d-none');
     });
   }
-
-  confirmYes.addEventListener('click', () => {
-    window.location.href = currentUrl;
-    confirmOverlay.classList.add('d-none');
+  async function postJson(url) {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Accept': 'application/json'
+    }
   });
 
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data.message || 'Erreur');
+  }
+  return data;
+}
+
+function updateQtyUI(id, newQty) {
+  const qtyInput = document.getElementById(`qty-${id}`);
+  if (qtyInput) qtyInput.value = newQty;
+
+  const row = document.getElementById(`cart-row-${id}`);
+  if (row) row.dataset.qty = newQty;
+
+  const price = row ? parseFloat(row.dataset.price || '0') : 0;
+  const lineTotal = document.getElementById(`line-${id}`);
+  if (lineTotal) lineTotal.textContent = (price * newQty).toFixed(0); // DT sans décimales (change si besoin)
+
+  recalcTotals();
+  refreshHeaderCounts();
+}
+
+// ✅ PLUS
+document.querySelectorAll('.btn-plus').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const id = btn.dataset.id;
+
+    try {
+      const data = await postJson(`/panier/augmenter/${id}`);
+
+      showToast(data.message, 'success');
+      updateCartBadge(data.count);
+
+      if (typeof data.quantite !== 'undefined') {
+        updateQtyUI(id, data.quantite);
+      }
+    } catch (e) {
+      showToast(e.message, 'danger');
+    }
+  });
+});
+
+// ✅ MINUS
+document.querySelectorAll('.btn-minus').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const id = btn.dataset.id;
+
+    try {
+      const data = await postJson(`/panier/diminuer/${id}`);
+
+      showToast(data.message, 'success');
+      updateCartBadge(data.count);
+
+      // si produit retiré, supprimer la ligne
+      if (data.message && data.message.toLowerCase().includes('retiré')) {
+        const row = document.getElementById(`cart-row-${id}`);
+        if (row) row.remove();
+        recalcTotals();
+        refreshHeaderCounts();
+        return;
+      }
+
+      if (typeof data.quantite !== 'undefined') {
+        updateQtyUI(id, data.quantite);
+      }
+    } catch (e) {
+      showToast(e.message, 'danger');
+    }
+  });
+});
+
+
+  // ---- Confirmation OUI : AJAX POST ----
+  confirmYes.addEventListener('click', async () => {
+    confirmOverlay.classList.add('d-none');
+    if (!currentAction) return;
+
+    try {
+      const res = await fetch(currentAction.url, {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json'
+        }
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        showToast(data.message || 'Erreur', 'danger');
+        currentAction = null;
+        return;
+      }
+
+      showToast(data.message, 'success');
+      updateCartBadge(data.count);
+
+      // ---- Effets UI ----
+      if (currentAction.type === 'delete' && currentAction.id) {
+        const row = document.getElementById(`cart-row-${currentAction.id}`);
+        if (row) row.remove();
+      }
+
+      if (currentAction.type === 'clear') {
+        // supprimer tout le contenu (simple)
+        const content = document.getElementById('cart-content');
+        if (content) content.remove();
+
+        // afficher le bloc "panier vide"
+        const container = document.querySelector('.container.py-5');
+        if (container) {
+          container.insertAdjacentHTML('beforeend', `
+            <div class="empty-cart text-center py-5" id="empty-cart-block">
+              <div class="empty-cart-icon mb-4">
+                <i class="bi bi-cart-x"></i>
+              </div>
+              <h3 class="mb-3">Votre panier est vide</h3>
+              <p class="text-muted mb-4">Découvrez nos produits et commencez vos achats !</p>
+              <a href="{{ path('front_produit_index') }}" class="btn btn-primary btn-lg px-5">
+                <i class="bi bi-shop me-2"></i>Découvrir nos produits
+              </a>
+            </div>
+          `);
+        }
+      }
+
+      refreshHeaderCounts();
+      recalcTotals();
+
+      // si plus aucun produit => reload léger (pour re-basculer sur vue vide propre)
+      const remaining = document.querySelectorAll('.cart-item.produit-row').length;
+      if (remaining === 0) {
+        setTimeout(() => location.reload(), 800);
+      }
+
+    } catch (e) {
+      showToast('Erreur réseau', 'danger');
+    }
+
+    currentAction = null;
+  });
+
+  // ---- Confirmation NON ----
   confirmNo.addEventListener('click', () => {
     confirmOverlay.classList.add('d-none');
+    currentAction = null;
   });
 
-  // Flash messages
+  // ---- Flash messages serveur (si tu en as encore) ----
   {% for message in app.flashes('success') %}
-    showToast("{{ message|e }}");
+    showToast("{{ message|e('js') }}", 'success');
   {% endfor %}
   {% for message in app.flashes('error') %}
-    showToast("{{ message|e }}", 'danger');
+    showToast("{{ message|e('js') }}", 'danger');
   {% endfor %}
 });
 </script>
-
-<script src="{{ asset('assets/js/panier-qty.js') }}"></script>
 
 <style>
 /* ===== PANIER MODERNE ===== */
@@ -317,12 +510,11 @@ document.addEventListener('DOMContentLoaded', () => {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-/* Contrôles de quantité */
+/* Contrôles de quantité (affichage) */
 .qty-control {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0;
   background: #f8f9fa;
   border-radius: 50px;
   padding: 4px;
@@ -330,28 +522,8 @@ document.addEventListener('DOMContentLoaded', () => {
   margin: 0 auto;
 }
 
-.qty-btn {
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: white;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.qty-btn:hover {
-  background: #0d6efd;
-  color: white;
-  transform: scale(1.1);
-}
-
 .qty-input {
-  width: 45px;
+  width: 60px;
   text-align: center;
   border: none;
   background: transparent;
@@ -449,11 +621,11 @@ document.addEventListener('DOMContentLoaded', () => {
   .panier-icon i {
     font-size: 3rem;
   }
-  
+
   .cart-item {
     padding: 1rem;
   }
-  
+
   .product-image img {
     height: 60px;
   }
