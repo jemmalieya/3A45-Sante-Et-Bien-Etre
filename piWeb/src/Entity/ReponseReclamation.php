@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ReponseReclamationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ReponseReclamationRepository::class)]
 class ReponseReclamation
@@ -14,11 +15,29 @@ class ReponseReclamation
     #[ORM\Column(name: "id_reponse")]
     private ?int $id_reponse = null;
 
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $message = null;
+    #[ORM\Column(type: "text")]
+#[Assert\NotBlank(
+    message: "Le message de la réponse est obligatoire."
+)]
+#[Assert\Length(
+    min: 10,
+    minMessage: "Le message doit contenir au moins {{ limit }} caractères.",
+    max: 1000,
+    maxMessage: "Le message ne doit pas dépasser {{ limit }} caractères."
+)]
+private ?string $message = null;
+
 
     #[ORM\Column(length: 50)]
-    private ?string $typeReponse = null;
+#[Assert\NotBlank(
+    message: "Le type de réponse est obligatoire."
+)]
+#[Assert\Choice(
+    choices: ["REPONSE", "DEMANDE_INFO", "REFUS"],
+    message: "Type de réponse invalide."
+)]
+private ?string $typeReponse = null;
+
 
     #[ORM\Column]
     private ?\DateTimeImmutable $date_creation_rep = null;

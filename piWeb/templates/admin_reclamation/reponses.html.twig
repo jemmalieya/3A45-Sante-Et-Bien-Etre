@@ -1,0 +1,111 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Réponses - {{ reclamation.referenceReclamation }}{% endblock %}
+
+{% block body %}
+<div class="container">
+
+  <div class="mb-4">
+    <h2 class="mb-1">Réponses à la réclamation</h2>
+    <p class="text-muted mb-0">
+      Référence : <strong>{{ reclamation.referenceReclamation }}</strong>
+    </p>
+  </div>
+
+  {# FLASH MESSAGES #}
+  {% for message in app.flashes('success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  {% endfor %}
+
+  {% for message in app.flashes('error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  {% endfor %}
+
+  <div class="mb-3 d-flex gap-2">
+    <a href="{{ path('admin_reclamation_list') }}"
+       class="btn btn-outline-secondary btn-sm">
+      ← Retour aux réclamations
+    </a>
+
+    {# AJOUTER UNE REPONSE #}
+    <a href="{{ path('admin_reclamation_repondre', {'id': reclamation.idReclamation}) }}"
+       class="btn btn-primary btn-sm">
+      + Ajouter une réponse
+    </a>
+  </div>
+
+  {% if reponses is empty %}
+    <div class="alert alert-info">
+      Aucune réponse pour cette réclamation.
+    </div>
+  {% else %}
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Type</th>
+              <th>Message</th>
+              <th>Date création</th>
+              <th>Date modification</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+          {% for rep in reponses %}
+            <tr>
+              <td>
+                {# Badge type (on garde ton style, juste plus lisible si tu veux) #}
+                {% if rep.typeReponse == 'REPONSE' %}
+                  <span class="badge bg-info text-dark">REPONSE</span>
+                {% elseif rep.typeReponse == 'DEMANDE_INFO' %}
+                  <span class="badge bg-warning text-dark">DEMANDE INFO</span>
+                {% elseif rep.typeReponse == 'REFUS' %}
+                  <span class="badge bg-danger">REFUS</span>
+                {% else %}
+                  <span class="badge bg-secondary">{{ rep.typeReponse }}</span>
+                {% endif %}
+              </td>
+
+              {# Message avec retours à la ligne #}
+              <td>{{ rep.message|nl2br }}</td>
+
+              <td>{{ rep.dateCreationRep ? rep.dateCreationRep|date('d/m/Y H:i') : '—' }}</td>
+              <td>{{ rep.dateModificationRep ? rep.dateModificationRep|date('d/m/Y H:i') : '—' }}</td>
+
+              <td class="text-end">
+                <div class="btn-group">
+
+                  <a href="{{ path('admin_reponse_edit', { 'id': rep.idReponse }) }}"
+                     class="btn btn-sm btn-outline-primary">
+                    Modifier
+                  </a>
+
+                  <form method="post"
+                        action="{{ path('admin_reponse_delete', { 'id': rep.idReponse }) }}"
+                        onsubmit="return confirm('Supprimer cette réponse ?');"
+                        style="display:inline-block;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete_reponse' ~ rep.idReponse) }}">
+                    <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+                  </form>
+
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+
+        </table>
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

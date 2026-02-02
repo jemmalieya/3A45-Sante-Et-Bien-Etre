@@ -1,0 +1,62 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Répondre à la réclamation{% endblock %}
+
+{% block body %}
+<div class="container">
+
+  <div class="mb-4">
+    <h2 class="mb-1">Répondre à la réclamation</h2>
+    <p class="text-muted mb-0">
+      Référence : <strong>{{ reclamation.referenceReclamation }}</strong>
+    </p>
+  </div>
+
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="small text-muted">Contenu</div>
+          <div class="fw-semibold">{{ reclamation.contenu }}</div>
+        </div>
+        <div class="col-md-6">
+          <div class="small text-muted">Type</div>
+          <div class="fw-semibold">{{ reclamation.type }}</div>
+        </div>
+        <div class="col-12">
+          <div class="small text-muted">Description</div>
+          <div>{{ reclamation.description }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body">
+      {{ form_start(form) }}
+
+      <div class="mb-3">
+        {{ form_label(form.typeReponse) }}
+        {{ form_widget(form.typeReponse, {'attr': {'class': 'form-select'}}) }}
+        {{ form_errors(form.typeReponse) }}
+      </div>
+
+      <div class="mb-3">
+        {{ form_label(form.message) }}
+        {{ form_widget(form.message, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.message) }}
+      </div>
+
+      <div class="d-flex justify-content-end gap-2">
+        <a href="{{ path('admin_reclamation_list') }}" class="btn btn-outline-secondary">
+          Retour
+        </a>
+        <button class="btn btn-primary">Envoyer la réponse</button>
+      </div>
+
+      {{ form_end(form) }}
+    </div>
+  </div>
+
+</div>
+{% endblock %}
