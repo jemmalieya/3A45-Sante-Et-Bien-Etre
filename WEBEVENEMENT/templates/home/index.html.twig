@@ -1,0 +1,138 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Home - MedFlow{% endblock %}
+{% block body_class %}index-page{% endblock %}
+
+{% block body %}
+<main class="main">
+
+  <!-- Hero Section -->
+  <section id="hero" class="hero section dark-background">
+    <div class="container-fluid p-0">
+      <div class="hero-wrapper">
+        <div class="hero-image">
+          <img src="{{ asset('assets/img/health/showcase-1.webp') }}" alt="Advanced Healthcare" class="img-fluid">
+        </div>
+
+        <div class="hero-content">
+          <div class="container">
+            <div class="row">
+              <div class="col-lg-7 col-md-10" data-aos="fade-right" data-aos-delay="100">
+                <div class="content-box">
+                  <span class="badge-accent" data-aos="fade-up" data-aos-delay="150">Leading Healthcare Specialists</span>
+                  <h1 data-aos="fade-up" data-aos-delay="200">Advanced Medical Care for Your Family's Health</h1>
+                  <p data-aos="fade-up" data-aos-delay="250">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  </p>
+
+                  <div class="cta-group" data-aos="fade-up" data-aos-delay="300">
+                    <a href="#" class="btn btn-primary">Book Appointment</a>
+                    <a href="#" class="btn btn-outline">Explore Services</a>
+                  </div>
+
+                  <div class="info-badges" data-aos="fade-up" data-aos-delay="350">
+                    <div class="badge-item">
+                      <i class="bi bi-telephone-fill"></i>
+                      <div class="badge-content">
+                        <span>Emergency Line</span>
+                        <strong>+1 (555) 987-6543</strong>
+                      </div>
+                    </div>
+                    <div class="badge-item">
+                      <i class="bi bi-clock-fill"></i>
+                      <div class="badge-content">
+                        <span>Working Hours</span>
+                        <strong>Mon-Fri: 8AM-8PM</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="features-wrapper">
+              <div class="row gy-4">
+                <div class="col-lg-4">
+                  <div class="feature-item" data-aos="fade-up" data-aos-delay="450">
+                    <div class="feature-icon">
+                      <i class="bi bi-heart-pulse-fill"></i>
+                    </div>
+                    <div class="feature-text">
+                      <h3>Cardiology</h3>
+                      <p>Lorem ipsum dolor sit amet.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-4">
+                  <div class="feature-item" data-aos="fade-up" data-aos-delay="500">
+                    <div class="feature-icon">
+                      <i class="bi bi-lungs-fill"></i>
+                    </div>
+                    <div class="feature-text">
+                      <h3>Pulmonology</h3>
+                      <p>Lorem ipsum dolor sit amet.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-4">
+                  <div class="feature-item" data-aos="fade-up" data-aos-delay="550">
+                    <div class="feature-icon">
+                      <i class="bi bi-capsule"></i>
+                    </div>
+                    <div class="feature-text">
+                      <h3>Diagnostics</h3>
+                      <p>Lorem ipsum dolor sit amet.</p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- /Hero Section -->
+
+  <!-- Home About Section -->
+  <section id="home-about" class="home-about section">
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+      <div class="row gy-5 align-items-center">
+
+        <div class="col-lg-6" data-aos="fade-right" data-aos-delay="200">
+          <div class="about-image">
+            <img src="{{ asset('assets/img/health/facilities-1.webp') }}" alt="Modern Healthcare Facility" class="img-fluid rounded-3 mb-4">
+            <div class="experience-badge">
+              <span class="years">25+</span>
+              <span class="text">Years of Excellence</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6" data-aos="fade-left" data-aos-delay="300">
+          <div class="about-content">
+            <h2>Committed to Exceptional Patient Care</h2>
+            <p class="lead">Lorem ipsum dolor sit amet.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+
+            <div class="cta-wrapper mt-4">
+              <a href="#" class="btn btn-primary">Learn More About Us</a>
+
+              {# ✅ Example link to events from inside page #}
+              <a href="{{ path('app_evenements') }}" class="btn btn-outline">See Events</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+  <!-- /Home About Section -->
+
+</main>
+{% endblock %}
