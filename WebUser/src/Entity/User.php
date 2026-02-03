@@ -14,19 +14,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    /**
-     * Mot de passe non hashé (utilisé seulement dans les formulaires)
-     */
-    #[Assert\Length(
-        min: 8,
-        minMessage: "Le mot de passe doit contenir au moins {{ limit }} caractères."
-    )]
-    #[Assert\Regex(
-        pattern: "/^(?=.*[A-Za-z])(?=.*\d).+$/",
-        message: "Le mot de passe doit contenir au moins une lettre et un chiffre."
-    )]
+    
+  
     private ?string $plainPassword = null;
 
+
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -117,23 +110,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $adresseUser = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "Le mot de passe est obligatoire.")]
-    #[Assert\Length(
-        min: 8,
-        max: 255,
-        minMessage: "Le mot de passe doit contenir au moins {{ limit }} caractères."
-    )]
     private ?string $password = null;
 
-    #[ORM\Column(length: 30, nullable: true)]
-    #[Assert\Choice(
-        choices: ["ACTIVE", "RESTRICTED", "BANNED"],
-        message: "Statut invalide (ACTIVE, RESTRICTED ou BANNED)."
-    )]
-    private ?string $statutCompte = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeInterface $derniereConnexion = null;
+#[Assert\Choice(
+    choices: ["ACTIVE", "RESTRICTED", "BANNED"],
+    message: "Statut invalide (ACTIVE, RESTRICTED ou BANNED).",
+    groups: ["admin"]
+)]
+private ?string $statutCompte = null;
+
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+private ?\DateTimeInterface $derniereConnexion = null;
 
     #[ORM\Column]
     private bool $isVerified = false;

@@ -56,7 +56,7 @@ class RegistrationController extends AbstractController
                     ->from(new Address('no-reply@medflow.test', 'medflow'))
                     ->to((string) $user->getEmailUser())
                     ->subject('Please Confirm your Email')
-                    ->htmlTemplate('registration/confirmation_email.html.twig')
+                    ->htmlTemplate('FrontUser/registration/confirmation_email.html.twig')
             );
 
             // Log the user in

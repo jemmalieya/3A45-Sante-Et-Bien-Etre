@@ -78,17 +78,15 @@ class UserProfileType extends AbstractType
                 ],
             ])
 
-            ->add('save', SubmitType::class, [
-                'label' => 'Enregistrer',
-                'attr' => ['class' => 'btn btn-primary'],
-            ])
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefaults([
-            'data_class' => User::class,
-        ]);
-    }
+  public function configureOptions(OptionsResolver $resolver): void
+{
+    $resolver->setDefaults([
+        'data_class' => User::class,
+        'validation_groups' => ['profile_edit'],
+    ]);
+}
+
 }

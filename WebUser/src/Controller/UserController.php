@@ -69,25 +69,30 @@ public function edit(Request $request, EntityManagerInterface $entityManager): R
 {
     $user = $this->getUser();
 
-    if (!$user) {
+    if (!$user instanceof User) {
         throw $this->createNotFoundException('User not found');
     }
 
     $form = $this->createForm(UserProfileType::class, $user);
     $form->handleRequest($request);
+    
 
-    $plainPassword = $form->get('plainPassword')->getData();
+    if ($form->isSubmitted() && $form->isValid()) {
 
-if ($plainPassword) {
-    $user->setPassword(
-        $this->get('security.password_encoder')->encodePassword($user, $plainPassword)
-    );
+        // mot de passe : seulement si rempli
+        $plainPassword = $form->get('plainPassword')->getData();
+        if (!empty($plainPassword)) {
+            $user->setPassword(
+                $this->passwordHasher->hashPassword($user, $plainPassword)
+            );
+        }
 
-
+        // ✅ important: force managed
+        $entityManager->persist($user);
         $entityManager->flush();
 
         $this->addFlash('success', 'Profile updated successfully');
-        return $this->redirectToRoute('app_home');  // Redirect to homepage after success
+        return $this->redirectToRoute('app_home');
     }
 
     return $this->render('user/edit_profile.html.twig', [
@@ -102,8 +107,8 @@ if ($plainPassword) {
     {
         if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->get('_token'))) {
             $entityManager->remove($user);
-            $entityManager->flush();
         }
+         $entityManager->flush();
 
         return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
     }
